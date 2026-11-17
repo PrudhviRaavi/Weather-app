@@ -1,0 +1,174 @@
+.weather-map-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  animation: slideUp 0.6s ease-out;
+}
+
+.weather-map-container h2 {
+  color: var(--primary);
+  font-size: 1.8rem;
+  margin: 0;
+}
+
+.map-search {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.map-input {
+  padding: 0.75rem;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  background: var(--input-bg);
+  color: var(--text);
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.map-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.map-info {
+  padding: 0.75rem;
+  background: var(--card-bg);
+  border-radius: 6px;
+  color: var(--text-light);
+  font-size: 0.9rem;
+  text-align: center;
+  min-height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-canvas {
+  width: 100%;
+  height: 500px;
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  background: var(--card-bg);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.map-canvas .leaflet-container {
+  background: var(--card-bg) !important;
+}
+
+.map-popup {
+  font-family: inherit;
+  padding: 0.5rem;
+}
+
+.map-popup h4 {
+  margin: 0 0 0.5rem 0;
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+.map-popup p {
+  margin: 0.25rem 0;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.map-legend {
+  background: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border-left: 4px solid var(--primary);
+}
+
+.map-legend h4 {
+  margin: 0 0 1rem 0;
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+.map-legend ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.map-legend li {
+  padding: 0.5rem 0;
+  color: var(--text);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.map-legend li:before {
+  content: '▪';
+  color: var(--primary);
+}
+
+/* Leaflet overrides for dark mode */
+.leaflet-control-attribution {
+  background: var(--input-bg) !important;
+  color: var(--text) !important;
+}
+
+.leaflet-control {
+  border-radius: 6px;
+  backdrop-filter: blur(10px);
+}
+
+.leaflet-popup-content-wrapper {
+  background: var(--card-bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.leaflet-popup-tip {
+  background: var(--card-bg) !important;
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+  color: var(--text) !important;
+}
+
+@media (max-width: 768px) {
+  .weather-map-container {
+    gap: 1rem;
+  }
+
+  .map-canvas {
+    height: 350px;
+  }
+
+  .weather-map-container h2 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .map-canvas {
+    height: 250px;
+  }
+
+  .map-legend {
+    padding: 1rem;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
