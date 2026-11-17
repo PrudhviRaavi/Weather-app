@@ -2,7 +2,7 @@
 
 A modern, full-stack weather application with real-time weather data, interactive charts, and beautiful UI.
 
-**Live Demo:** Coming Soon | **Status:** ✅ Production Ready
+**Live Demo:** Coming Soon | **Status:** Active development
 
 ---
 
@@ -47,7 +47,7 @@ A modern, full-stack weather application with real-time weather data, interactiv
 - **Vite** - Frontend build tool
 - **Tailwind CSS** - Utility-first styling
 - **Chart.js** 4.x - Data visualization
-- **Leaflet** 4.2.1 - Interactive maps
+- **Leaflet** 1.9.4 and React Leaflet 4.2.1 - Interactive maps
 - **CSS Grid/Flexbox** - Responsive design
 - **Axios** - HTTP client
 
@@ -72,7 +72,7 @@ A modern, full-stack weather application with real-time weather data, interactiv
 
 ## 📋 Prerequisites
 
-- **Node.js** 14+ and npm
+- **Node.js** 18+ and npm
 - **Git**
 - **OpenWeatherMap API Key** (free tier) - [Get one here](https://openweathermap.org/api)
 - **Gmail account** (for email alerts - optional)
@@ -83,8 +83,8 @@ A modern, full-stack weather application with real-time weather data, interactiv
 
 ### 1. Clone Repository
 ```bash
-git clone https://github.com/yourusername/weather-app.git
-cd weather-app
+git clone https://github.com/PrudhviRaavi/Weather-app.git
+cd Weather-app
 ```
 
 ### 2. Backend Setup
@@ -92,7 +92,8 @@ cd weather-app
 cd backend
 npm install
 cp .env.example .env
-# Edit .env and add your API keys
+# Edit .env and add your credentials
+npm run db:migrate
 npm start
 # Server runs on http://localhost:5000
 ```
@@ -101,7 +102,7 @@ npm start
 ```bash
 cd frontend
 npm install
-npm start
+npm run dev
 # App runs on http://localhost:3000
 ```
 
@@ -175,10 +176,10 @@ VITE_API_URL=http://localhost:5000/api
 ## 📚 API Endpoints
 
 ### Weather
-- `GET /api/weather/:city` - Current weather
-- `GET /api/forecast/:city` - 5-day forecast
-- `GET /api/air-quality/:city` - Air quality data
-- `GET /api/uv-index/:city` - UV index
+- `GET /api/weather/city/:city` - Current weather
+- `GET /api/weather/forecast/:city` - 5-day forecast
+- `GET /api/weather/aqi/:city` - Air quality data
+- `GET /api/weather/uv/:city` - UV index
 
 ### Alerts
 - `POST /api/alerts` - Create alert
@@ -187,7 +188,7 @@ VITE_API_URL=http://localhost:5000/api
 
 ### History
 - `GET /api/history/city/:city` - Historical data
-- `GET /api/history/stats` - Statistics
+- `GET /api/history/stats/:city` - Statistics
 
 ### Authentication
 - `POST /api/auth/register` - Create account
@@ -200,7 +201,7 @@ VITE_API_URL=http://localhost:5000/api
 
 For detailed deployment instructions, see [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
 
-### Quick Deployment (Railway.app)
+### Quick Deployment
 1. Push code to GitHub
 2. Connect repository to Railway.app
 3. Set environment variables
@@ -237,9 +238,9 @@ For detailed deployment instructions, see [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUI
 
 ## 📝 Project Details
 
-- **Created:** February 2026
-- **Version:** 1.0
-- **Status:** Production Ready ✅
+- **Last updated:** November 17, 2026
+- **Version:** 2.0
+- **Status:** Active development
 - **License:** MIT
 
 ---
@@ -288,7 +289,7 @@ cd backend
 npm install
 # Create .env file from .env.example
 cp .env.example .env
-# Add your API keys to .env
+# Add your credentials to .env
 npm run dev
 ```
 
@@ -298,7 +299,7 @@ cd frontend
 npm install
 # Create .env file from .env.example
 cp .env.example .env
-npm start
+npm run dev
 ```
 
 ### Database Setup
@@ -316,9 +317,6 @@ You'll need to obtain the following API keys:
 1. **OpenWeatherMap API** - Free tier available
    - Sign up at: https://openweathermap.org/api
    - API Key: `API_KEY`
-2. **Mapbox API** (Optional for maps)
-   - Sign up at: https://www.mapbox.com
-   - API Key: `MAPBOX_API_KEY`
 
 ## Environment Variables
 
@@ -342,7 +340,7 @@ VITE_API_URL=http://localhost:5000/api
 1. Start MySQL database
 2. Apply migrations: `cd backend && npx prisma migrate deploy`
 3. Run backend: `cd backend && npm run dev`
-4. Run frontend: `cd frontend && npm start`
+4. Run frontend: `cd frontend && npm run dev`
 5. Open http://localhost:3000 in your browser
 
 ## API Endpoints

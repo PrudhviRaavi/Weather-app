@@ -1,8 +1,8 @@
 # 🚀 Deployment Guide - Weather App
 
-**Last Updated**: February 14, 2026
+**Last Updated**: November 17, 2026
 
-This guide helps you deploy the Weather App to **Railway** and **Render** for free!
+This guide helps you deploy the Weather App to Railway or Render.
 
 ---
 
@@ -27,13 +27,9 @@ This guide helps you deploy the Weather App to **Railway** and **Render** for fr
 #### 1️⃣ **Push Code to GitHub**
 
 ```bash
-# In your project folder
-git init
-git add .
-git commit -m "Initial commit - Weather App"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/weather-app.git
-git push -u origin main
+# Clone the existing repository
+git clone https://github.com/PrudhviRaavi/Weather-app.git
+cd Weather-app
 ```
 
 #### 2️⃣ **Connect to Railway**
@@ -42,7 +38,7 @@ git push -u origin main
 2. Click **"Start a New Project"**
 3. Select **"Deploy from GitHub"**
 4. Choose your `weather-app` repository
-5. Railway will auto-detect your project
+5. Railway will use the repository configuration
 
 #### 3️⃣ **Configure Environment Variables**
 
@@ -55,6 +51,7 @@ On Railway dashboard:
 
 ```
 API_KEY = your_openweathermap_api_key_here
+DATABASE_URL = mysql://root:your_password@your-mysql-host:3306/weather_db
 EMAIL_USER = your_email@gmail.com
 EMAIL_PASS = your_app_password_here
 JWT_SECRET_KEY = your_strong_random_secret_key_here
@@ -68,7 +65,8 @@ PORT = 5000
 2. Select `weather-app` again
 3. Configure:
    - **Root Directory**: `backend`
-   - **Start Command**: `npm install && node server.js`
+   - **Build Command**: `npm install && npx prisma generate && npx prisma migrate deploy`
+   - **Start Command**: `npm start`
 4. Railway will auto-deploy!
 
 #### 5️⃣ **Deploy Frontend**
@@ -78,7 +76,7 @@ PORT = 5000
 3. Configure:
    - **Root Directory**: `frontend`
    - **Build Command**: `npm install && npm run build`
-   - **Start Command**: `npx serve -s build -l 3000`
+   - **Start Command**: `npm run preview -- --host 0.0.0.0 --port 3000`
 4. Add environment variable:
    ```
    VITE_API_URL = https://your-backend-domain.railway.app/api
@@ -102,15 +100,11 @@ PORT = 5000
 
 ### Step-by-Step
 
-#### 1️⃣ **Push Code to GitHub** (same as Railway)
+#### 1️⃣ **Use the GitHub repository**
 
 ```bash
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin YOUR_GITHUB_REPO
-git push -u origin main
+git clone https://github.com/PrudhviRaavi/Weather-app.git
+cd Weather-app
 ```
 
 #### 2️⃣ **Deploy Backend to Render**
@@ -122,12 +116,13 @@ git push -u origin main
 5. Configure:
    - **Name**: `weather-app-backend`
    - **Branch**: `main`
-   - **Build Command**: `npm install`
-   - **Start Command**: `cd backend && node server.js`
+   - **Build Command**: `cd backend && npm install && npx prisma generate`
+   - **Start Command**: `cd backend && npx prisma migrate deploy && npm start`
    - **Runtime**: `Node`
 6. Under **"Advanced"** → Add environment variables:
    ```
    API_KEY = your_openweathermap_api_key_here
+   DATABASE_URL = mysql://root:your_password@your-mysql-host:3306/weather_db
    EMAIL_USER = your_email@gmail.com
    EMAIL_PASS = your_gmail_app_password_here
    JWT_SECRET_KEY = your_strong_random_secret_key_here
@@ -142,7 +137,7 @@ git push -u origin main
 3. Configure:
    - **Name**: `weather-app-frontend`
    - **Build Command**: `cd frontend && npm install && npm run build`
-   - **Start Command**: `cd frontend && npx serve -s build -l 3000`
+   - **Start Command**: `cd frontend && npm run preview -- --host 0.0.0.0 --port 3000`
 4. Environment variables:
    ```
    VITE_API_URL = https://weather-app-backend-xxx.onrender.com/api
@@ -186,8 +181,7 @@ After deployment:
 - Check CORS settings in backend
 
 ### "Email not sending"
-- Verify `EMAIL_PASS` is correct (Gmail app password)
-- Check Gmail "Less secure app access" is enabled
+- Verify `EMAIL_PASS` is a valid Gmail app password
 - Check backend logs for email errors
 
 ### "Map not showing"

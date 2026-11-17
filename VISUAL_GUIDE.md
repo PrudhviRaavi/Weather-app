@@ -67,7 +67,7 @@ User's Browser
     │                     ┌─────────────────┘
     │                     │
     │                     ├─ Validates input
-    │                     ├─ Adds JWT token
+    │                     ├─ Sends HttpOnly JWT cookie
     │                     └─ Sends API request
     │                            │
     ├──← HTTP Response ──────────┤
@@ -77,7 +77,7 @@ User's Browser
     │                            │
     │            ┌───────────────┼───────────────┐
     │            │               │               │
-    │     Check JWT Token   Get Weather Data  Query Database
+    │     Check JWT Cookie  Get Weather Data  Query Database
     │            │          from OpenWeatherMap   │
     │            └───────────────┼───────────────┘
     │                            │
@@ -211,22 +211,17 @@ POST /api/auth/register
 
 Backend authController.js
 - Check if email exists
-- Hash password with bcryptjs
+- Hash password with Argon2id
 - Create new user in database
 - Generate JWT token
 
            ↓
 
-Response with:
-{
-  user: { id, email, username },
-  token: "eyJhbGciOi..."
-}
+Response with the user profile. The JWT is set in an HttpOnly cookie.
 
            ↓
 
 Frontend Stores:
-- localStorage.setItem('token', token)
 - localStorage.setItem('user', JSON.stringify(user))
 - setUser(user) updates state
 
@@ -270,20 +265,19 @@ Backend (.env)
 Login Process
 ┌─────────────────────────────────────────┐
 │ 1. User enters email & password         │
-│ 2. Frontend hashes password (client)    │
+│ 2. Frontend sends credentials over HTTPS │
 │ 3. Sent to backend                      │
-│ 4. Backend hashes received password     │
+│ 4. Backend hashes with Argon2id          │
 │ 5. Compares with stored hash            │
 │ 6. If match: Generate JWT token        │
-│ 7. Return token to frontend             │
-│ 8. Frontend saves in localStorage       │
+│ 7. Set JWT in an HttpOnly cookie         │
+│ 8. Browser sends cookie on API requests │
 └─────────────────────────────────────────┘
 
 Protected Request
 ┌─────────────────────────────────────────┐
 │ 1. User requests /locations             │
-│ 2. Frontend adds header:                │
-│    Cookie: HttpOnly JWT cookie          │
+│ 2. Browser automatically sends cookie   │
 │ 3. Backend middleware verifies token    │
 │ 4. If valid: Continue to handler        │
 │ 5. If invalid: Return 401 Unauthorized  │
@@ -307,8 +301,7 @@ ADD FAVORITE:
 3. Backend inserts into locations table:
    INSERT INTO locations
    (user_id, city, lat, lon)
-   VALUES ($1, $2, $3, $4)
-   RETURNING *
+   VALUES (?, ?, ?, ?)
 4. Return new location object
 
 GET FAVORITES:
@@ -362,14 +355,14 @@ Open Browser Console (F12)
 Check Authentication:
 1. Open Application/Storage tab
 2. LocalStorage
-3. Look for 'token' and 'user'
-4. Verify values exist
+3. Look for the authenticated user profile
+4. Verify the HttpOnly cookie is present in the request
 
 Check Network Requests:
 1. Open Network tab
 2. Make a search request
 3. Click request → Headers tab
-4. Verify Authorization header present
+4. Verify the request includes the cookie
 5. Check response status (200 = good)
 
 Check Errors:
@@ -397,7 +390,7 @@ Current (Development)
 │ (Express)   │
 └─────────────┘
        │
-       │ localhost:5432
+       │ localhost:3306
        ↓
 ┌─────────────┐
 │  MySQL      │
@@ -421,7 +414,7 @@ Production (Deployment)
         │ Database queries
         ↓
 ┌──────────────────┐
-│ AWS RDS/MongoDB  │ Database
+│ Managed MySQL    │ Database
 │   (Database)     │ Managed DB
 └──────────────────┘
 ```
