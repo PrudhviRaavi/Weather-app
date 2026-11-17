@@ -1,13 +1,19 @@
 const db = require('../database');
 const { generateToken, hashPassword, comparePassword } = require('../utils/auth');
-const { v4: uuidv4 } = require('uuid');
+
+const authCookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  maxAge: 7 * 24 * 60 * 60 * 1000
+};
 
 exports.register = async (req, res) => {
   try {
     const { email, password, username } = req.body;
 
     // Check if user already exists
-    const userExists = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+    const userExists = await db.user.findUnique({ where: { email } });
 
     if (userExists) {
       return res.status(400).json({ error: 'User already exists' });
@@ -17,18 +23,16 @@ exports.register = async (req, res) => {
     const hashedPassword = await hashPassword(password);
 
     // Create user with UUID
-    const userId = uuidv4();
-    db.prepare(
-      'INSERT INTO users (id, email, password, username) VALUES (?, ?, ?, ?)'
-    ).run(userId, email, hashedPassword, username);
-
-    const user = db.prepare('SELECT id, email, username FROM users WHERE id = ?').get(userId);
+    const user = await db.user.create({
+      data: { email, password: hashedPassword, username },
+      select: { id: true, email: true, username: true }
+    });
     const token = generateToken(user.id);
 
+    res.cookie('token', token, authCookieOptions);
     res.status(201).json({
       message: 'User registered successfully',
-      user,
-      token
+      user
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -40,7 +44,7 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
 
     // Find user
-    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+    const user = await db.user.findUnique({ where: { email } });
 
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
@@ -55,10 +59,10 @@ exports.login = async (req, res) => {
 
     const token = generateToken(user.id);
 
+    res.cookie('token', token, authCookieOptions);
     res.json({
       message: 'Login successful',
-      user: { id: user.id, email: user.email, username: user.username },
-      token
+      user: { id: user.id, email: user.email, username: user.username }
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -66,6 +70,6 @@ exports.login = async (req, res) => {
 };
 
 exports.logout = (req, res) => {
-  // Token is stateless, logout handled on frontend by removing token
+  res.clearCookie('token', authCookieOptions);
   res.json({ message: 'Logged out successfully' });
 };

@@ -2,159 +2,108 @@ const cron = require('node-cron');
 const db = require('../database');
 const { sendDailySummary, sendAlertEmail } = require('./emailService');
 const { getCurrentWeather } = require('./weatherAPI');
-const { v4: uuidv4 } = require('uuid');
 
 let scheduledJobs = {};
 
-// Start all scheduled jobs
-exports.startScheduledJobs = () => {
-  console.log('Starting scheduled jobs...');
-  
-  // Run daily weather summary at 8:00 AM
-  scheduledJobs.dailySummary = cron.schedule('0 8 * * *', async () => {
-    console.log('Running daily weather summary job...');
-    await runDailySummaryJob();
-  });
+const evaluateAlert = (alert, weather) => {
+  const temperature = weather.main.temp;
+  const condition = weather.weather[0].main.toLowerCase();
 
-  // Check alerts every hour
-  scheduledJobs.checkAlerts = cron.schedule('0 * * * *', async () => {
-    console.log('Checking alerts...');
-    await checkAndTriggerAlertsJob();
-  });
-
-  // Run daily cleanup at 2:00 AM
-  scheduledJobs.cleanup = cron.schedule('0 2 * * *', async () => {
-    console.log('Running cleanup job...');
-    await cleanupOldNotifications();
-  });
-
-  console.log('✓ Scheduled jobs started');
+  if (alert.alertType === 'temperature_high' && temperature > alert.threshold) {
+    return `Temperature ${temperature}°C exceeds ${alert.threshold}°C`;
+  }
+  if (alert.alertType === 'temperature_low' && temperature < alert.threshold) {
+    return `Temperature ${temperature}°C below ${alert.threshold}°C`;
+  }
+  if (alert.alertType === 'rain' && (condition.includes('rain') || condition.includes('drizzle'))) {
+    return `Rain detected in ${alert.city}`;
+  }
+  if (alert.alertType === 'wind' && weather.wind.speed > alert.threshold) {
+    return `Wind speed ${weather.wind.speed} m/s exceeds ${alert.threshold} m/s`;
+  }
+  return null;
 };
 
-// Daily summary job
+exports.startScheduledJobs = () => {
+  console.log('Starting scheduled jobs...');
+  scheduledJobs.dailySummary = cron.schedule('0 8 * * *', runDailySummaryJob);
+  scheduledJobs.checkAlerts = cron.schedule('0 * * * *', checkAndTriggerAlertsJob);
+  scheduledJobs.cleanup = cron.schedule('0 2 * * *', cleanupOldNotifications);
+  console.log('Scheduled jobs started');
+};
+
 const runDailySummaryJob = async () => {
   try {
-    const userStmt = db.prepare('SELECT id, email, username FROM users');
-    const users = userStmt.all();
+    const users = await db.user.findMany({
+      select: { id: true, email: true, username: true, locations: { distinct: ['city'], take: 5, select: { city: true } } }
+    });
 
     for (const user of users) {
-      try {
-        const favoritesStmt = db.prepare('SELECT DISTINCT city FROM locations WHERE user_id = ? LIMIT 5');
-        const favorites = favoritesStmt.all(user.id);
-
-        if (favorites.length === 0) continue;
-
-        // Send summary for each favorite city
-        for (const fav of favorites) {
-          try {
-            const weather = await getCurrentWeather(fav.city);
-            await sendDailySummary(user, weather, fav.city);
-          } catch (error) {
-            console.error(`Error fetching weather for ${fav.city}:`, error.message);
-          }
+      for (const location of user.locations) {
+        try {
+          const weather = await getCurrentWeather(location.city);
+          await sendDailySummary(user, weather, location.city);
+        } catch (error) {
+          console.error(`Error fetching weather for ${location.city}:`, error.message);
         }
-      } catch (error) {
-        console.error(`Error processing daily summary for user ${user.id}:`, error.message);
       }
     }
   } catch (error) {
-    console.error('Error in dailySummary job:', error);
+    console.error('Error in daily summary job:', error);
   }
 };
 
-// Check and trigger alerts job
 const checkAndTriggerAlertsJob = async () => {
   try {
-    const alertsStmt = db.prepare(`
-      SELECT a.*, u.email FROM alerts a
-      JOIN users u ON a.user_id = u.id
-      WHERE a.is_active = 1
-    `);
-    const activeAlerts = alertsStmt.all();
+    const alerts = await db.alert.findMany({
+      where: { isActive: true },
+      include: { user: { select: { email: true } } }
+    });
 
-    for (const alert of activeAlerts) {
+    for (const alert of alerts) {
       try {
         const weather = await getCurrentWeather(alert.city);
-        const temp = weather.main.temp;
-        const condition = weather.weather[0].main.toLowerCase();
+        const reason = evaluateAlert(alert, weather);
+        if (!reason) continue;
 
-        let isTriggered = false;
-        let triggerReason = '';
-
-        // Check alert conditions
-        if (alert.alert_type === 'temperature_high' && temp > alert.threshold) {
-          isTriggered = true;
-          triggerReason = `Temperature ${temp}°C exceeds ${alert.threshold}°C`;
-        } else if (alert.alert_type === 'temperature_low' && temp < alert.threshold) {
-          isTriggered = true;
-          triggerReason = `Temperature ${temp}°C below ${alert.threshold}°C`;
-        } else if (alert.alert_type === 'rain' && (condition.includes('rain') || condition.includes('drizzle'))) {
-          isTriggered = true;
-          triggerReason = `Rain detected in ${alert.city}`;
-        } else if (alert.alert_type === 'wind' && weather.wind.speed > alert.threshold) {
-          isTriggered = true;
-          triggerReason = `Wind speed ${weather.wind.speed} m/s exceeds ${alert.threshold} m/s`;
-        }
-
-        if (isTriggered) {
-          // Check if we already sent an email for this in the last hour
-          const lastNotifStmt = db.prepare(`
-            SELECT * FROM notifications 
-            WHERE alert_id = ? AND created_at > datetime('now', '-1 hour')
-          `);
-          const lastNotif = lastNotifStmt.get(alert.id);
-
-          if (!lastNotif) {
-            // Store notification
-            const notificationId = uuidv4();
-            const notifStmt = db.prepare(`
-              INSERT INTO notifications (id, user_id, alert_id, message, is_read, created_at)
-              VALUES (?, ?, ?, ?, 0, ?)
-            `);
-            notifStmt.run(notificationId, alert.user_id, alert.id, triggerReason, new Date().toISOString());
-
-            // Send email if enabled
-            try {
-              await sendAlertEmail(
-                { email: alert.email },
-                {
-                  city: alert.city,
-                  alertType: alert.alert_type,
-                  threshold: alert.threshold,
-                  reason: triggerReason
-                },
-                weather
-              );
-            } catch (error) {
-              console.error('Error sending alert email:', error.message);
-            }
+        const recentNotification = await db.notification.findFirst({
+          where: {
+            alertId: alert.id,
+            createdAt: { gt: new Date(Date.now() - 60 * 60 * 1000) }
           }
-        }
+        });
+        if (recentNotification) continue;
+
+        await db.notification.create({
+          data: { userId: alert.userId, alertId: alert.id, type: 'alert', message: reason }
+        });
+        await sendAlertEmail(
+          alert.user,
+          { city: alert.city, alertType: alert.alertType, threshold: alert.threshold, reason },
+          weather
+        );
       } catch (error) {
         console.error(`Error checking alert for ${alert.city}:`, error.message);
       }
     }
   } catch (error) {
-    console.error('Error in checkAlerts job:', error);
+    console.error('Error in check alerts job:', error);
   }
 };
 
-// Cleanup old notifications (older than 30 days)
 const cleanupOldNotifications = async () => {
   try {
-    const deleteStmt = db.prepare(`
-      DELETE FROM notifications 
-      WHERE created_at < datetime('now', '-30 days')
-    `);
-    deleteStmt.run();
-    console.log('✓ Cleanup job completed');
+    const result = await db.notification.deleteMany({
+      where: { createdAt: { lt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } }
+    });
+    console.log(`Deleted ${result.count} old notifications`);
   } catch (error) {
     console.error('Error in cleanup job:', error);
   }
 };
 
-// Stop all scheduled jobs
 exports.stopScheduledJobs = () => {
-  Object.values(scheduledJobs).forEach(job => job.stop());
-  console.log('✓ All scheduled jobs stopped');
+  Object.values(scheduledJobs).forEach((job) => job.stop());
+  scheduledJobs = {};
+  console.log('All scheduled jobs stopped');
 };

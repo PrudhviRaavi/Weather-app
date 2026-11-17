@@ -2,17 +2,19 @@ import React, { useState, useEffect } from 'react';
 import WeatherCharts from './WeatherCharts';
 import '../styles/WeatherHistory.css';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 const historyService = {
-  getHistory: (city, days = 7) => fetch(`http://localhost:5000/api/history/city/${city}?days=${days}`, {
-    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+  getHistory: (city, days = 7) => fetch(`${API_BASE}/history/city/${city}?days=${days}`, {
+    credentials: 'include',
   }).then(r => r.json()),
   
-  getStats: (city, days = 7) => fetch(`http://localhost:5000/api/history/stats?city=${city}&days=${days}`, {
-    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+  getStats: (city, days = 7) => fetch(`${API_BASE}/history/stats/${city}?days=${days}`, {
+    credentials: 'include',
   }).then(r => r.json()),
   
-  getSearchHistory: () => fetch('http://localhost:5000/api/history/search-history', {
-    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+  getSearchHistory: () => fetch(`${API_BASE}/history/search-history`, {
+    credentials: 'include',
   }).then(r => r.json())
 };
 

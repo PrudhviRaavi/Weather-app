@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+const argon2 = require('argon2');
 
 exports.generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
@@ -8,10 +8,9 @@ exports.generateToken = (id) => {
 };
 
 exports.hashPassword = async (password) => {
-  const salt = await bcrypt.genSalt(10);
-  return bcrypt.hash(password, salt);
+  return argon2.hash(password);
 };
 
 exports.comparePassword = async (password, hashedPassword) => {
-  return bcrypt.compare(password, hashedPassword);
+  return argon2.verify(hashedPassword, password);
 };

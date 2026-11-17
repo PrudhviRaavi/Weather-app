@@ -3,6 +3,8 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import '../styles/WeatherMap.css';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 const WeatherMap = ({ city = 'London' }) => {
   const mapRef = useRef(null);
   const [weather, setWeather] = useState(null);
@@ -60,7 +62,9 @@ const WeatherMap = ({ city = 'London' }) => {
     setLoading(true);
     try {
       // Get coordinates for the city
-      const response = await fetch(`http://localhost:5000/api/weather/city/${selectedCity}`);
+      const response = await fetch(`${API_BASE}/weather/city/${selectedCity}`, {
+        credentials: 'include'
+      });
       const data = await response.json();
       
       if (data && data.coord) {

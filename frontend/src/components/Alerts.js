@@ -1,40 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/Alerts.css';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 const alertService = {
-  createAlert: (data) => fetch('http://localhost:5000/api/alerts', {
+  createAlert: (data) => fetch(`${API_BASE}/alerts`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   }).then(r => r.json()),
   
-  getAlerts: () => fetch('http://localhost:5000/api/alerts', {
-    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+  getAlerts: () => fetch(`${API_BASE}/alerts`, {
+    credentials: 'include',
   }).then(r => r.json()),
   
-  updateAlert: (id, data) => fetch(`http://localhost:5000/api/alerts/${id}`, {
+  updateAlert: (id, data) => fetch(`${API_BASE}/alerts/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   }).then(r => r.json()),
   
-  deleteAlert: (id) => fetch(`http://localhost:5000/api/alerts/${id}`, {
+  deleteAlert: (id) => fetch(`${API_BASE}/alerts/${id}`, {
     method: 'DELETE',
-    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    credentials: 'include',
   }).then(r => r.json()),
   
-  checkAlerts: () => fetch('http://localhost:5000/api/alerts/check-alerts', {
+  checkAlerts: () => fetch(`${API_BASE}/alerts/check-alerts`, {
     method: 'POST',
-    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    credentials: 'include',
   }).then(r => r.json()),
   
-  getNotifications: () => fetch('http://localhost:5000/api/alerts/notifications', {
-    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+  getNotifications: () => fetch(`${API_BASE}/alerts/notifications`, {
+    credentials: 'include',
   }).then(r => r.json()),
   
-  markNotificationRead: (id) => fetch(`http://localhost:5000/api/alerts/notifications/${id}/read`, {
+  markNotificationRead: (id) => fetch(`${API_BASE}/alerts/notifications/${id}/read`, {
     method: 'PUT',
-    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    credentials: 'include',
   }).then(r => r.json())
 };
 

@@ -23,7 +23,6 @@ const AuthForm = ({ onLoginSuccess }) => {
       } else {
         response = await authService.register(email, password, username);
       }
-      localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
       onLoginSuccess(response.data.user);
     } catch (err) {

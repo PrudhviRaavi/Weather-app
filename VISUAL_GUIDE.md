@@ -8,7 +8,7 @@ START HERE
 ┌─────────────────────────┐
 │  Install Prerequisites  │
 │ - Node.js              │
-│ - PostgreSQL           │
+│ - MySQL               │
 │ Time: 10 minutes       │
 └─────────────────────────┘
     ↓
@@ -22,7 +22,7 @@ START HERE
 ┌─────────────────────────┐
 │  Setup Database         │
 │ - Create weather_db    │
-│ - Run schema.sql       │
+│ - Run Prisma migration │
 │ Time: 3 minutes        │
 └─────────────────────────┘
     ↓
@@ -83,7 +83,7 @@ User's Browser
     │                            │
     │     ┌──────────────────────┤
     │     ↓                      ↓
-    │  PostgreSQL            OpenWeatherMap API
+    │  MySQL                 OpenWeatherMap API
     │  Database              (openweathermap.org)
     │
     └──── JSON Response with Weather Data ────
@@ -138,7 +138,7 @@ Backend (Express)
 
     ↓ SQL Queries ↓
 
-PostgreSQL
+MySQL
     │
     ├─ users (accounts)
     ├─ locations (favorites)
@@ -243,7 +243,7 @@ User is logged in! ✅
 ```
 Frontend (.env)
 ┌──────────────────────────────────────┐
-│ REACT_APP_API_URL=                   │
+│ VITE_API_URL=                        │
 │ http://localhost:5000/api            │
 └──────────────────────────────────────┘
          ↓
@@ -253,13 +253,9 @@ Frontend (.env)
 
 Backend (.env)
 ┌──────────────────────────────────────┐
-│ OPENWEATHER_API_KEY=xxx              │ ← Get from OpenWeatherMap
+│ API_KEY=xxx                          │ ← Get from OpenWeatherMap
 │ JWT_SECRET_KEY=xxx                   │ ← Generate locally
-│ DB_HOST=localhost                    │ ← PostgreSQL location
-│ DB_PORT=5432                         │ ← PostgreSQL port
-│ DB_NAME=weather_db                   │ ← Database name
-│ DB_USER=postgres                     │ ← DB username
-│ DB_PASSWORD=xxx                      │ ← DB password (setup during install)
+│ DATABASE_URL=mysql://...             │ ← MySQL connection
 │ PORT=5000                            │ ← Backend port
 │ NODE_ENV=development                 │ ← Development mode
 │ FRONTEND_URL=http://localhost:3000   │ ← CORS allowed URL
@@ -287,7 +283,7 @@ Protected Request
 ┌─────────────────────────────────────────┐
 │ 1. User requests /locations             │
 │ 2. Frontend adds header:                │
-│    Authorization: Bearer <jwt_token>    │
+│    Cookie: HttpOnly JWT cookie          │
 │ 3. Backend middleware verifies token    │
 │ 4. If valid: Continue to handler        │
 │ 5. If invalid: Return 401 Unauthorized  │
@@ -404,7 +400,7 @@ Current (Development)
        │ localhost:5432
        ↓
 ┌─────────────┐
-│  PostgreSQL │
+│  MySQL      │
 │  (Database) │
 └─────────────┘
 

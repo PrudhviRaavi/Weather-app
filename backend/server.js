@@ -1,11 +1,12 @@
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const helmet = require('helmet');
 require('dotenv').config();
 
 // Validate required environment variables
-const requiredEnvVars = ['API_KEY', 'EMAIL_USER', 'EMAIL_PASS', 'JWT_SECRET_KEY'];
+const requiredEnvVars = ['API_KEY', 'DATABASE_URL', 'JWT_SECRET_KEY'];
 const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
 
 if (missingEnvVars.length > 0) {
@@ -22,6 +23,7 @@ const { verifyEmailConfig } = require('./utils/emailService');
 // Middleware
 app.use(helmet());
 app.use(morgan('combined'));
+app.use(cookieParser());
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true
@@ -58,8 +60,9 @@ app.listen(PORT, () => {
   // Start scheduled jobs
   startScheduledJobs();
 
-  // Verify email configuration
-  verifyEmailConfig().catch(err => {
-    console.warn('⚠️ Email service not fully configured. Alerts will not send emails.');
-  });
+  if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+    verifyEmailConfig().catch(() => {
+      console.warn('Email service not fully configured. Alerts will not send emails.');
+    });
+  }
 });

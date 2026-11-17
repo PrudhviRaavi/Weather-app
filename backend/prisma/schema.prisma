@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String           @id @default(uuid()) @db.Char(36)
+  email              String           @unique @db.VarChar(255)
+  password           String           @db.VarChar(255)
+  username           String?          @db.VarChar(100)
+  theme              String           @default("light") @db.VarChar(50)
+  temperatureUnit    String           @default("C") @map("temperature_unit") @db.VarChar(1)
+  language           String           @default("en") @db.VarChar(50)
+  emailNotifications Boolean          @default(true) @map("email_notifications")
+  createdAt          DateTime         @default(now()) @map("created_at")
+  updatedAt          DateTime         @updatedAt @map("updated_at")
+  locations          Location[]
+  weatherHistory     WeatherHistory[]
+  alerts             Alert[]
+  notifications      Notification[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model Location {
+  id      String   @id @default(uuid()) @db.Char(36)
+  userId  String   @map("user_id") @db.Char(36)
+  city    String   @db.VarChar(100)
+  lat     Float?
+  lon     Float?
+  country String?  @db.VarChar(100)
+  name    String?  @db.VarChar(100)
+  savedAt DateTime @default(now()) @map("saved_at")
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("locations")
+}
+
+model WeatherHistory {
+  id          String   @id @default(uuid()) @db.Char(36)
+  userId      String   @map("user_id") @db.Char(36)
+  city        String   @db.VarChar(100)
+  temperature Float?
+  humidity    Int?
+  windSpeed   Float?   @map("wind_speed")
+  condition   String?  @db.VarChar(100)
+  pressure    Float?
+  recordedAt  DateTime @default(now()) @map("recorded_at")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, city, recordedAt])
+  @@map("weather_history")
+}
+
+model Alert {
+  id            String         @id @default(uuid()) @db.Char(36)
+  userId        String         @map("user_id") @db.Char(36)
+  city          String         @db.VarChar(100)
+  alertType     String         @map("alert_type") @db.VarChar(50)
+  threshold     Float?
+  isActive      Boolean        @default(true) @map("is_active")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notifications Notification[]
+
+  @@index([userId])
+  @@map("alerts")
+}
+
+model Notification {
+  id            String    @id @default(uuid()) @db.Char(36)
+  userId        String    @map("user_id") @db.Char(36)
+  alertId       String?   @map("alert_id") @db.Char(36)
+  type          String?   @db.VarChar(50)
+  message       String?
+  isRead        Boolean   @default(false) @map("is_read")
+  scheduledTime DateTime? @map("scheduled_time")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  alert         Alert?    @relation(fields: [alertId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([alertId, createdAt])
+  @@map("notifications")
+}

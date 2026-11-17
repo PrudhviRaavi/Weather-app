@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/AirQuality.css';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 const aqiService = {
-  getAirQuality: (city) => fetch(`http://localhost:5000/api/weather/aqi/${city}`, {
-    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+  getAirQuality: (city) => fetch(`${API_BASE}/weather/aqi/${city}`, {
+    credentials: 'include',
   }).then(r => r.json()),
   
-  getUVIndex: (city) => fetch(`http://localhost:5000/api/weather/uv/${city}`, {
-    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+  getUVIndex: (city) => fetch(`${API_BASE}/weather/uv/${city}`, {
+    credentials: 'include',
   }).then(r => r.json())
 };
 

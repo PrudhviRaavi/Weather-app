@@ -44,6 +44,8 @@ A modern, full-stack weather application with real-time weather data, interactiv
 
 ### Frontend
 - **React** 18.2.0 - UI framework
+- **Vite** - Frontend build tool
+- **Tailwind CSS** - Utility-first styling
 - **Chart.js** 4.x - Data visualization
 - **Leaflet** 4.2.1 - Interactive maps
 - **CSS Grid/Flexbox** - Responsive design
@@ -52,8 +54,10 @@ A modern, full-stack weather application with real-time weather data, interactiv
 ### Backend
 - **Node.js** - Runtime
 - **Express.js** - Web framework
-- **SQLite** - Database
-- **JWT** - Authentication
+- **MySQL** - Relational SQL database
+- **Prisma** - Database ORM and migrations
+- **Argon2id** - Password hashing
+- **JWT in HttpOnly cookies** - Authentication
 - **Nodemailer** - Email service
 - **node-cron** - Job scheduling
 
@@ -116,7 +120,8 @@ weather-app/
 │   ├── middleware/         # Authentication, validators
 │   ├── utils/              # Helper functions, APIs
 │   ├── server.js           # Express app
-│   ├── database.js         # SQLite config
+│   ├── database.js         # Prisma client
+│   ├── prisma/             # MySQL schema and migrations
 │   └── package.json
 │
 ├── frontend/
@@ -129,9 +134,6 @@ weather-app/
 │   ├── public/
 │   └── package.json
 │
-├── database/
-│   └── schema.sql          # Database structure
-│
 └── README.md               # This file
 ```
 
@@ -143,6 +145,9 @@ weather-app/
 ```env
 # OpenWeatherMap API
 API_KEY=your_api_key_here
+
+# MySQL
+DATABASE_URL=mysql://root:your_password@localhost:3306/weather_db
 
 # Authentication
 JWT_SECRET_KEY=your_secret_key_here
@@ -160,7 +165,7 @@ NODE_ENV=development
 
 ### Frontend (.env)
 ```env
-REACT_APP_API_URL=http://localhost:5000
+VITE_API_URL=http://localhost:5000/api
 ```
 
 > ⚠️ Never commit `.env` files with real keys. Use `.env.example` as template.
@@ -297,10 +302,11 @@ npm start
 ```
 
 ### Database Setup
-1. Create PostgreSQL database named `weather_db`
-2. Run the schema:
+1. Create MySQL database named `weather_db`
+2. Apply Prisma migrations:
 ```bash
-psql -U postgres -d weather_db -f database/schema.sql
+cd backend
+npx prisma migrate deploy
 ```
 
 ## Required API Keys
@@ -309,7 +315,7 @@ You'll need to obtain the following API keys:
 
 1. **OpenWeatherMap API** - Free tier available
    - Sign up at: https://openweathermap.org/api
-   - API Key: `OPENWEATHER_API_KEY`
+   - API Key: `API_KEY`
 2. **Mapbox API** (Optional for maps)
    - Sign up at: https://www.mapbox.com
    - API Key: `MAPBOX_API_KEY`
@@ -318,14 +324,9 @@ You'll need to obtain the following API keys:
 
 ### Backend (.env)
 ```
-OPENWEATHER_API_KEY=your_key
-GOOGLE_GEOLOCATION_KEY=your_key
+API_KEY=your_key
 JWT_SECRET_KEY=your_secret
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=weather_db
-DB_USER=postgres
-DB_PASSWORD=your_password
+DATABASE_URL=mysql://root:your_password@localhost:3306/weather_db
 PORT=5000
 NODE_ENV=development
 FRONTEND_URL=http://localhost:3000
@@ -333,15 +334,16 @@ FRONTEND_URL=http://localhost:3000
 
 ### Frontend (.env)
 ```
-REACT_APP_API_URL=http://localhost:5000/api
+VITE_API_URL=http://localhost:5000/api
 ```
 
 ## Running the Application
 
-1. Start PostgreSQL database
-2. Run backend: `cd backend && npm run dev`
-3. Run frontend: `cd frontend && npm start`
-4. Open http://localhost:3000 in your browser
+1. Start MySQL database
+2. Apply migrations: `cd backend && npx prisma migrate deploy`
+3. Run backend: `cd backend && npm run dev`
+4. Run frontend: `cd frontend && npm start`
+5. Open http://localhost:3000 in your browser
 
 ## API Endpoints
 
@@ -383,7 +385,7 @@ Tables:
 - Change PORT in backend .env or kill the process using that port
 
 ### Issue: "Database connection failed"
-- Ensure PostgreSQL is running
+- Ensure MySQL is running
 - Check DB credentials in .env
 
 ## Contributing

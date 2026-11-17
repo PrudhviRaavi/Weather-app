@@ -81,7 +81,7 @@ PORT = 5000
    - **Start Command**: `npx serve -s build -l 3000`
 4. Add environment variable:
    ```
-   REACT_APP_API_URL = https://your-backend-domain.railway.app
+   VITE_API_URL = https://your-backend-domain.railway.app/api
    ```
 5. Deploy!
 
@@ -145,7 +145,7 @@ git push -u origin main
    - **Start Command**: `cd frontend && npx serve -s build -l 3000`
 4. Environment variables:
    ```
-   REACT_APP_API_URL = https://weather-app-backend-xxx.onrender.com
+   VITE_API_URL = https://weather-app-backend-xxx.onrender.com/api
    ```
 5. Click **"Create Web Service"**
 
@@ -229,7 +229,7 @@ Your app is now live on the internet!
 ## 🎯 Next Optimization Steps
 
 1. **Database Backup**
-   - Setup automated SQLite backups
+   - Configure automated MySQL backups
    - Store in cloud (AWS S3, Google Cloud)
 
 2. **Monitoring**
