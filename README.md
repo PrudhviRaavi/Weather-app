@@ -109,8 +109,6 @@ npm run db:generate
 npm run db:migrate
 ```
 
-The existing `alerts`, `notifications`, and `weather_history` tables are not deleted by application migrations. They may remain in databases that previously used those features.
-
 ## Build
 
 ```powershell
