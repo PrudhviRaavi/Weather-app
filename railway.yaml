@@ -37,16 +37,11 @@ spec:
             secretKeyRef:
               name: weather-app-secrets
               key: api-key
-        - name: EMAIL_USER
+        - name: DATABASE_URL
           valueFrom:
             secretKeyRef:
               name: weather-app-secrets
-              key: email-user
-        - name: EMAIL_PASS
-          valueFrom:
-            secretKeyRef:
-              name: weather-app-secrets
-              key: email-pass
+              key: database-url
         - name: JWT_SECRET_KEY
           valueFrom:
             secretKeyRef:
