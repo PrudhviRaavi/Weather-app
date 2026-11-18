@@ -191,8 +191,6 @@ const WeatherData = ({ city }) => {
           <h3>☀️ Additional Info</h3>
           <div className="additional-info">
             <p>💡 For UV Index and Air Quality data, visit the Air Quality tab</p>
-            <p>📊 View historical trends in the History tab</p>
-            <p>🚨 Set up alerts to stay informed about weather changes</p>
           </div>
         </div>
       </div>

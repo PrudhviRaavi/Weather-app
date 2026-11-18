@@ -162,7 +162,6 @@ After deployment:
 - [ ] Verify real weather data displays
 - [ ] Check forecast data
 - [ ] Test air quality page
-- [ ] Click through alerts page
 - [ ] Try the weather map
 - [ ] Verify no console errors
 
@@ -206,7 +205,6 @@ Your app is now live on the internet!
 
 **Next Steps**:
 - Add custom domain (optional)
-- Set up alerts/monitoring
 - Add CI/CD pipeline for auto-deployment
 - Consider upgrading to paid tier if needed
 

@@ -142,9 +142,6 @@ MySQL
     │
     ├─ users (accounts)
     ├─ locations (favorites)
-    ├─ weather_history
-    ├─ alerts
-    └─ notifications
 ```
 
 ---

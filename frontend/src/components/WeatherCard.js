@@ -35,6 +35,9 @@ const WeatherCard = ({ tempUnit, onCitySelect }) => {
       if (onCitySelect) {
         onCitySelect(searchCity);
       }
+      window.dispatchEvent(new CustomEvent('weather-observation-saved', {
+        detail: { city: response.data.name || searchCity }
+      }));
     } catch (err) {
       setError('Failed to fetch weather data');
     } finally {

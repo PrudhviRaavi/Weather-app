@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import { FaCloudSun, FaEye, FaEyeSlash, FaMoon, FaSignInAlt, FaSun, FaUserPlus } from 'react-icons/fa';
 import { authService } from '../services/api';
 import '../styles/Auth.css';
 
-const AuthForm = ({ onLoginSuccess }) => {
+const AuthForm = ({ onLoginSuccess, theme, onToggleTheme }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -34,9 +35,21 @@ const AuthForm = ({ onLoginSuccess }) => {
 
   return (
     <div className="auth-container">
+      <button
+        type="button"
+        className="auth-theme-toggle"
+        onClick={onToggleTheme}
+        title={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
+        aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
+      >
+        {theme === 'light' ? <FaMoon /> : <FaSun />}
+      </button>
       <div className="auth-card">
         <div className="auth-header">
-          <h1>🌤️ Weather App</h1>
+          <div className="auth-logo-mark" aria-hidden="true">
+            <FaCloudSun />
+          </div>
+          <h1>Weather App</h1>
           <p>{isLogin ? 'Welcome Back!' : 'Join Us Today!'}</p>
         </div>
 
@@ -89,7 +102,7 @@ const AuthForm = ({ onLoginSuccess }) => {
                 className="password-toggle"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? '🙈' : '👁️'}
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
           </div>
@@ -99,7 +112,14 @@ const AuthForm = ({ onLoginSuccess }) => {
             className="auth-submit"
             disabled={loading}
           >
-            {loading ? '⟳ Loading...' : isLogin ? '🔓 Login' : '✨ Register'}
+            {loading ? (
+              'Loading...'
+            ) : (
+              <>
+                {isLogin ? <FaSignInAlt /> : <FaUserPlus />}
+                <span>{isLogin ? 'Login' : 'Register'}</span>
+              </>
+            )}
           </button>
         </form>
 
@@ -125,9 +145,8 @@ const AuthForm = ({ onLoginSuccess }) => {
           <ul>
             <li>🌍 Real-time weather anywhere</li>
             <li>🗺️ Interactive weather maps</li>
-            <li>📊 Historical trends</li>
-            <li>🚨 Smart weather alerts</li>
-            <li>📧 Daily summaries</li>
+            <li>🌫️ Air quality information</li>
+            <li>🌗 Light and dark themes</li>
           </ul>
         </div>
       </div>

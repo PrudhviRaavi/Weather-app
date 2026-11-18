@@ -32,7 +32,14 @@ exports.getForecast = async (city) => {
           humidity: item.main.humidity,
           windSpeed: item.wind.speed,
           pressure: item.main.pressure,
-          icon: item.weather[0].icon
+          icon: item.weather[0].icon,
+          probability: item.pop ?? 0
+        };
+
+        exports.getRainProbability = async (city) => {
+          const forecast = await exports.getForecast(city);
+          const probabilities = forecast.forecasts.map((item) => item.probability ?? 0);
+          return probabilities.length ? Math.max(...probabilities) * 100 : 0;
         };
       }
     });

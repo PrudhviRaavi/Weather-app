@@ -26,18 +26,6 @@ A modern, full-stack weather application with real-time weather data, interactiv
 - 🌙 Full dark mode support
 - 📱 Fully responsive design (mobile, tablet, desktop)
 
-### 📢 Alert & Notification System
-- 🚨 Create custom weather alerts
-- 📧 Email notifications via Gmail SMTP
-- ⏰ Scheduled daily weather summaries
-- 🔔 Real-time alert triggers
-
-### 📊 Historical Data & Analytics
-- 📅 Track weather history by date range
-- 📈 View historical statistics
-- 💾 Store up to 90 days of data
-- 🔍 Search and filter weather records
-
 ---
 
 ## 🛠 Tech Stack
@@ -58,8 +46,6 @@ A modern, full-stack weather application with real-time weather data, interactiv
 - **Prisma** - Database ORM and migrations
 - **Argon2id** - Password hashing
 - **JWT in HttpOnly cookies** - Authentication
-- **Nodemailer** - Email service
-- **node-cron** - Job scheduling
 
 ### APIs
 - **OpenWeatherMap** - Weather data (FREE tier)
@@ -75,7 +61,6 @@ A modern, full-stack weather application with real-time weather data, interactiv
 - **Node.js** 18+ and npm
 - **Git**
 - **OpenWeatherMap API Key** (free tier) - [Get one here](https://openweathermap.org/api)
-- **Gmail account** (for email alerts - optional)
 
 ---
 
@@ -181,15 +166,6 @@ VITE_API_URL=http://localhost:5000/api
 - `GET /api/weather/aqi/:city` - Air quality data
 - `GET /api/weather/uv/:city` - UV index
 
-### Alerts
-- `POST /api/alerts` - Create alert
-- `GET /api/alerts` - Get user alerts
-- `DELETE /api/alerts/:id` - Delete alert
-
-### History
-- `GET /api/history/city/:city` - Historical data
-- `GET /api/history/stats/:city` - Statistics
-
 ### Authentication
 - `POST /api/auth/register` - Create account
 - `POST /api/auth/login` - Login
@@ -215,11 +191,8 @@ For detailed deployment instructions, see [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUI
 ### Frontend Components
 - **WeatherCard** - Current weather display with 5-day forecast
 - **AirQuality** - Air quality data and UV index
-- **WeatherHistory** - Historical data and analysis
-- **WeatherCharts** - Interactive trend visualization ✨ NEW
 - **WeatherData** - Sun times, moon phase, wind details ✨ NEW
 - **AuthForm** - Modern login/register interface ✨ NEW
-- **Alerts** - Alert management
 - **WeatherMap** - Interactive Leaflet map
 
 ---
@@ -360,19 +333,11 @@ VITE_API_URL=http://localhost:5000/api
 - `GET /api/locations` - Get all favorites
 - `DELETE /api/locations/:id` - Delete location
 
-### Alerts
-- `POST /api/alerts` - Create alert
-- `GET /api/alerts` - Get alerts
-- `DELETE /api/alerts/:id` - Delete alert
-
 ## Database Schema
 
 Tables:
 - `users` - User accounts and preferences
 - `locations` - Favorite locations
-- `weather_history` - Historical weather data
-- `alerts` - Weather alerts
-- `notifications` - User notifications
 
 ## Troubleshooting
 

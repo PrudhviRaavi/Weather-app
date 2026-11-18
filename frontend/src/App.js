@@ -1,12 +1,12 @@
 import React from 'react';
+import { FaCloudSun, FaSmog, FaMapMarkedAlt, FaMoon, FaSun, FaSignOutAlt } from 'react-icons/fa';
 import './styles/App.css';
 import WeatherCard from './components/WeatherCard';
 import AuthForm from './components/AuthForm';
-import Alerts from './components/Alerts';
-import WeatherHistory from './components/WeatherHistory';
 import AirQuality from './components/AirQuality';
 import WeatherMap from './components/WeatherMap';
 import WeatherData from './components/WeatherData';
+import { authService } from './services/api';
 
 function App() {
   const [user, setUser] = React.useState(null);
@@ -28,7 +28,12 @@ function App() {
     document.documentElement.setAttribute('data-theme', savedTheme);
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error('Logout request failed:', error);
+    }
     localStorage.removeItem('user');
     localStorage.removeItem('userId');
     setUser(null);
@@ -51,19 +56,25 @@ function App() {
     <div className="App" data-theme={theme}>
       <header className="App-header">
         <div className="header-left">
-          <h1>🌤️ Weather App</h1>
+          <span className="app-logo-mark" aria-hidden="true">
+            <FaCloudSun />
+          </span>
+          <h1>Weather App</h1>
         </div>
         {user && (
           <div className="header-right">
             <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">
-              {theme === 'light' ? '🌙' : '☀️'}
+              {theme === 'light' ? <FaMoon /> : <FaSun />}
             </button>
             <button className="temp-toggle" onClick={toggleTempUnit} title="Toggle temperature unit">
               °{tempUnit}
             </button>
             <div className="user-info">
               <span>{user.username || user.email}</span>
-              <button className="logout-btn" onClick={handleLogout}>Logout</button>
+              <button className="logout-btn" onClick={handleLogout}>
+                <FaSignOutAlt />
+                <span>Logout</span>
+              </button>
             </div>
           </div>
         )}
@@ -75,38 +86,33 @@ function App() {
             className={`nav-btn ${currentPage === 'weather' ? 'active' : ''}`}
             onClick={() => setCurrentPage('weather')}
           >
-            🌤️ Weather
-          </button>
-          <button
-            className={`nav-btn ${currentPage === 'alerts' ? 'active' : ''}`}
-            onClick={() => setCurrentPage('alerts')}
-          >
-            🚨 Alerts
-          </button>
-          <button
-            className={`nav-btn ${currentPage === 'history' ? 'active' : ''}`}
-            onClick={() => setCurrentPage('history')}
-          >
-            📊 History
+            <FaCloudSun />
+            <span>Weather</span>
           </button>
           <button
             className={`nav-btn ${currentPage === 'aqi' ? 'active' : ''}`}
             onClick={() => setCurrentPage('aqi')}
           >
-            🌫️ Air Quality
+            <FaSmog />
+            <span>Air Quality</span>
           </button>
           <button
             className={`nav-btn ${currentPage === 'map' ? 'active' : ''}`}
             onClick={() => setCurrentPage('map')}
           >
-            🗺️ Map
+            <FaMapMarkedAlt />
+            <span>Map</span>
           </button>
         </nav>
       )}
 
       <main className="App-main">
         {!user ? (
-          <AuthForm onLoginSuccess={setUser} />
+          <AuthForm
+            onLoginSuccess={setUser}
+            theme={theme}
+            onToggleTheme={toggleTheme}
+          />
         ) : (
           <>
             {currentPage === 'weather' && (
@@ -115,8 +121,6 @@ function App() {
                 <WeatherData city={selectedCity} />
               </div>
             )}
-            {currentPage === 'alerts' && <Alerts />}
-            {currentPage === 'history' && <WeatherHistory city={selectedCity} tempUnit={tempUnit} />}
             {currentPage === 'aqi' && <AirQuality city={selectedCity} />}
             {currentPage === 'map' && <WeatherMap city={selectedCity} />}
           </>

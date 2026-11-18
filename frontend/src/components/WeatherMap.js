@@ -7,6 +7,7 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const WeatherMap = ({ city = 'London' }) => {
   const mapRef = useRef(null);
+  const markerRef = useRef(null);
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedCity, setSelectedCity] = useState(city);
@@ -19,20 +20,15 @@ const WeatherMap = ({ city = 'London' }) => {
     if (!mapContainer || mapRef.current) return;
 
     try {
-      // Check if Leaflet already initialized this container
-      if (mapContainer._leaflet_id) {
-        mapRef.current = L.map('weather-map');
-      } else {
-        const leafletMap = L.map('weather-map').setView([51.5074, -0.1278], 10);
+      const leafletMap = L.map('weather-map').setView([51.5074, -0.1278], 10);
         
-        // Add OpenStreetMap tiles
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap contributors',
-          maxZoom: 19,
-        }).addTo(leafletMap);
+      // Add OpenStreetMap tiles
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19,
+      }).addTo(leafletMap);
 
-        mapRef.current = leafletMap;
-      }
+      mapRef.current = leafletMap;
 
       // Load initial city
       fetchWeatherAndUpdateMap();
@@ -42,6 +38,10 @@ const WeatherMap = ({ city = 'London' }) => {
 
     // Cleanup on unmount
     return () => {
+      if (markerRef.current) {
+        markerRef.current.remove();
+        markerRef.current = null;
+      }
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
@@ -74,15 +74,14 @@ const WeatherMap = ({ city = 'London' }) => {
         // Update map center
         mapRef.current.setView([lat, lon], 10);
         
-        // Clear existing markers
-        mapRef.current.eachLayer((layer) => {
-          if (layer instanceof L.Marker) {
-            mapRef.current.removeLayer(layer);
-          }
-        });
+        // Replace the single current-city marker
+        if (markerRef.current) {
+          markerRef.current.remove();
+          markerRef.current = null;
+        }
 
         // Add city marker with popup
-        const marker = L.marker([lat, lon])
+        markerRef.current = L.marker([lat, lon])
           .addTo(mapRef.current)
           .bindPopup(`
             <div class="map-popup">

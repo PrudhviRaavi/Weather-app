@@ -215,62 +215,48 @@
 }
 
 /* Dark Mode */
-@media (prefers-color-scheme: dark) {
-  .weather-data-container {
-    background: linear-gradient(135deg, #1a3a52 0%, #16213e 100%);
-  }
+[data-theme="dark"] .weather-data-container {
+  background: var(--bg-light);
+  border: 1px solid var(--border);
+}
 
-  .weather-data-card {
-    background: #0f3460;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  }
+[data-theme="dark"] .weather-data-card {
+  background: var(--card-bg);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
 
-  .weather-data-card h3 {
-    color: #e0e0e0;
-  }
+[data-theme="dark"] .weather-data-card h3,
+[data-theme="dark"] .moon-name,
+[data-theme="dark"] .moisture-bar label {
+  color: var(--text);
+}
 
-  .time-value,
-  .atmo-value,
-  .wind-value {
-    color: #00d4ff;
-  }
+[data-theme="dark"] .time-label,
+[data-theme="dark"] .moon-percentage,
+[data-theme="dark"] .moisture-bar span {
+  color: var(--text-light);
+}
 
-  .atmo-item,
-  .wind-item {
-    background: #1a3a52;
-  }
+[data-theme="dark"] .time-value,
+[data-theme="dark"] .atmo-value,
+[data-theme="dark"] .wind-value {
+  color: #93c5fd;
+}
 
-  .atmo-label,
-  .wind-label,
-  .moisture-bar label {
-    color: #b0b0b0;
-  }
+[data-theme="dark"] .atmo-item,
+[data-theme="dark"] .wind-item,
+[data-theme="dark"] .additional-info p {
+  background: var(--input-bg);
+  color: var(--text-light);
+}
 
-  .bar {
-    background: #1a3a52;
-  }
+[data-theme="dark"] .atmo-label,
+[data-theme="dark"] .wind-label {
+  color: var(--text-light);
+}
 
-  .bar .fill {
-    background: linear-gradient(90deg, #00d4ff 0%, #0099cc 100%);
-  }
-
-  .moisture-bar span {
-    color: #666;
-  }
-
-  .additional-info p {
-    background: #1a3a52;
-    color: #b0b0b0;
-    border-left-color: #00d4ff;
-  }
-
-  .moon-name {
-    color: #e0e0e0;
-  }
-
-  .moon-percentage {
-    color: #666;
-  }
+[data-theme="dark"] .bar {
+  background: var(--border);
 }
 
 /* Responsive Design */
