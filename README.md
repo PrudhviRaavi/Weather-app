@@ -122,7 +122,6 @@ weatherapp/
 │   ├── routes/
 │   ├── utils/
 │   ├── database.js
-│   ├── railway.json
 │   └── server.js
 ├── frontend/
 │   ├── src/
@@ -139,9 +138,7 @@ weatherapp/
 
 ### Railway backend
 
-The backend deployment configuration is [backend/railway.json](./backend/railway.json).
-
-Deploy `backend/` as a Railway service and configure:
+The backend is deployed from the `backend/` directory on Railway. Create or use a Railway MySQL database and configure these service variables:
 
 - `API_KEY`
 - `DATABASE_URL`
@@ -150,19 +147,30 @@ Deploy `backend/` as a Railway service and configure:
 - `PORT=5000`
 - `FRONTEND_URL=https://your-vercel-domain`
 
-The backend start command runs Prisma migrations before starting Express.
+Recommended Railway service settings:
+
+- Root Directory: `backend`
+- Build Command: `npm install && npm run build`
+- Start Command: `npm start`
+
+The start command runs `prisma migrate deploy` before starting Express. Set `FRONTEND_URL` to the exact Vercel origin, including `https://` and no trailing path.
 
 ### Vercel frontend
 
-The frontend deployment configuration is [frontend/vercel.json](./frontend/vercel.json).
-
-Deploy `frontend/` as a Vercel project and set:
+The frontend is deployed on Vercel from the `frontend/` directory. Set this environment variable for the Vercel project:
 
 ```env
 VITE_API_URL=https://your-railway-backend/api
 ```
 
-Set `FRONTEND_URL` on Railway to the exact Vercel origin. Use HTTPS and a production cookie configuration when authentication spans different domains.
+Recommended Vercel settings:
+
+- Framework Preset: `Vite`
+- Root Directory: `frontend`
+- Build Command: `npm run build`
+- Output Directory: `dist`
+
+The frontend already includes `frontend/vercel.json` SPA routing configuration. Because Vercel and Railway use different domains, authentication requires HTTPS cookies with `SameSite=None` in production, and the Railway `FRONTEND_URL` must match the Vercel origin.
 
 ## Build
 
