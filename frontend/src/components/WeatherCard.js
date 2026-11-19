@@ -57,7 +57,7 @@ const WeatherCard = ({ tempUnit, onCitySelect }) => {
       const response = await locationService.getLocations();
       setFavorites(response.data || []);
     } catch (err) {
-      console.log('Could not load favorites');
+      setFavorites([]);
     }
   };
 
@@ -72,7 +72,7 @@ const WeatherCard = ({ tempUnit, onCitySelect }) => {
           setFavorites(favorites.filter(f => f.id !== fav.id));
           setIsFavorite(false);
         } catch (err) {
-          console.log('Error removing favorite');
+          setError('Failed to remove favorite');
         }
       }
     } else {
@@ -87,7 +87,7 @@ const WeatherCard = ({ tempUnit, onCitySelect }) => {
         setFavorites([...favorites, newFav.data]);
         setIsFavorite(true);
       } catch (err) {
-        console.log('Error adding favorite');
+        setError('Failed to add favorite');
       }
     }
   };

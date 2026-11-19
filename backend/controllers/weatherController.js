@@ -3,7 +3,6 @@ const { getCurrentWeather, getForecast, getWeatherByCoordinates, getAirQuality, 
 exports.getWeatherByCity = async (req, res) => {
   try {
     const { city } = req.params;
-    console.log('Fetching weather for city:', city);
     const weather = await getCurrentWeather(city);
     res.json(weather);
   } catch (error) {

@@ -32,7 +32,7 @@ function App() {
     try {
       await authService.logout();
     } catch (error) {
-      console.error('Logout request failed:', error);
+      console.warn('Logout endpoint unavailable; clearing the local session.');
     }
     localStorage.removeItem('user');
     localStorage.removeItem('userId');

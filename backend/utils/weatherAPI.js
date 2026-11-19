@@ -5,7 +5,6 @@ const API_KEY = process.env.API_KEY;
 exports.getCurrentWeather = async (city) => {
   try {
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`;
-    console.log(`Fetching real weather data for: ${city}`);
     const response = await axios.get(url);
     return response.data;
   } catch (error) {
@@ -17,7 +16,6 @@ exports.getCurrentWeather = async (city) => {
 exports.getForecast = async (city) => {
   try {
     const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric`;
-    console.log(`Fetching 5-day forecast for: ${city}`);
     const response = await axios.get(url);
     
     // Format forecast data
@@ -57,7 +55,6 @@ exports.getForecast = async (city) => {
 exports.getAirQuality = async (lat, lon) => {
   try {
     const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${API_KEY}`;
-    console.log(`Fetching air quality for coordinates: ${lat}, ${lon}`);
     const response = await axios.get(url);
     
     const aqi = response.data.list[0].main.aqi;
@@ -85,7 +82,6 @@ exports.getAirQuality = async (lat, lon) => {
 exports.getUVIndex = async (lat, lon) => {
   try {
     const url = `https://api.openweathermap.org/data/2.5/uvi?lat=${lat}&lon=${lon}&appid=${API_KEY}`;
-    console.log(`Fetching UV index for coordinates: ${lat}, ${lon}`);
     const response = await axios.get(url);
     
     return {
@@ -104,7 +100,6 @@ exports.getUVIndex = async (lat, lon) => {
 exports.getWeatherByCoordinates = async (lat, lon) => {
   try {
     const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`;
-    console.log(`Fetching weather for coordinates: ${lat}, ${lon}`);
     const response = await axios.get(url);
     return response.data;
   } catch (error) {

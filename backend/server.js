@@ -42,7 +42,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/weather', require('./routes/weather'));
 app.use('/api/locations', require('./routes/locations'));
-app.use('/api/users', require('./routes/users'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

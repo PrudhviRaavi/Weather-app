@@ -109,6 +109,61 @@ npm run db:generate
 npm run db:migrate
 ```
 
+The repository preserves earlier migration folders for migration-history compatibility. Those legacy migrations may create tables that are no longer used by active application code; the application no longer registers Alerts, History, notification routes, or jobs. No migration in this repository automatically deletes existing data.
+
+## Project Structure
+
+```text
+weatherapp/
+├── backend/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── prisma/
+│   ├── routes/
+│   ├── utils/
+│   ├── database.js
+│   ├── railway.json
+│   └── server.js
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── styles/
+│   │   └── services/
+│   ├── index.html
+│   ├── vite.config.js
+│   └── vercel.json
+└── README.md
+```
+
+## Production Deployment
+
+### Railway backend
+
+The backend deployment configuration is [backend/railway.json](./backend/railway.json).
+
+Deploy `backend/` as a Railway service and configure:
+
+- `API_KEY`
+- `DATABASE_URL`
+- `JWT_SECRET_KEY`
+- `NODE_ENV=production`
+- `PORT=5000`
+- `FRONTEND_URL=https://your-vercel-domain`
+
+The backend start command runs Prisma migrations before starting Express.
+
+### Vercel frontend
+
+The frontend deployment configuration is [frontend/vercel.json](./frontend/vercel.json).
+
+Deploy `frontend/` as a Vercel project and set:
+
+```env
+VITE_API_URL=https://your-railway-backend/api
+```
+
+Set `FRONTEND_URL` on Railway to the exact Vercel origin. Use HTTPS and a production cookie configuration when authentication spans different domains.
+
 ## Build
 
 ```powershell
